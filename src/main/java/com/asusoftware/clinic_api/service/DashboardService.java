@@ -1,6 +1,7 @@
 package com.asusoftware.clinic_api.service;
 
 import com.asusoftware.clinic_api.model.TimeOffRequestStatus;
+import com.asusoftware.clinic_api.model.dto.AssistantDashboardResponse;
 import com.asusoftware.clinic_api.model.dto.DashboardResponse;
 import com.asusoftware.clinic_api.repository.*;
 import lombok.RequiredArgsConstructor;
@@ -42,12 +43,11 @@ public class DashboardService {
                     .totalAssistants(assistants)
                     .todayAppointments(appointments)
                     .todayMaterialUsages(usages)
-                    .pendingTimeOffRequests(pending)
+                    .timeOffRequests(pending)
                     .build();
 
         } else if (roles.contains("DOCTOR")) {
             UUID userId = UUID.fromString(jwt.getSubject());
-
             int appointments = appointmentRepo.countTodayAppointmentsByDoctor(userId);
             int usages = materialUsageRepo.countTodayByDoctor(userId);
             int ownTimeOffs = timeOffRepo.findByUserId(userId).size();
@@ -55,10 +55,23 @@ public class DashboardService {
             return DashboardResponse.builder()
                     .todayAppointments(appointments)
                     .todayMaterialUsages(usages)
-                    .pendingTimeOffRequests(ownTimeOffs)
+                    .timeOffRequests(ownTimeOffs)
+                    .build();
+
+        } else if (roles.contains("ASSISTANT")) {
+            UUID userId = UUID.fromString(jwt.getSubject());
+            int appointments = appointmentRepo.countTodayAppointmentsByAssistant(userId);
+            int usages = materialUsageRepo.countTodayByAssistant(userId);
+            int ownTimeOffs = timeOffRepo.findByUserId(userId).size();
+
+            return DashboardResponse.builder()
+                    .todayAppointments(appointments)
+                    .todayMaterialUsages(usages)
+                    .timeOffRequests(ownTimeOffs)
                     .build();
         }
 
         throw new ResponseStatusException(HttpStatus.FORBIDDEN);
     }
+
 }

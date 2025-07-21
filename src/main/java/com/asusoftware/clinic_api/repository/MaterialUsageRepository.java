@@ -21,4 +21,8 @@ public interface MaterialUsageRepository extends JpaRepository<MaterialUsage, UU
     @Query("SELECT COUNT(m) FROM MaterialUsage m WHERE DATE(m.usageDate) = CURRENT_DATE AND m.doctor.userId = :userId")
     int countTodayByDoctor(@Param("userId") UUID userId);
 
+    @Query("SELECT COUNT(m) FROM MaterialUsage m WHERE DATE(m.usageDate) = CURRENT_DATE AND m.assistant.userId = :userId")
+    int countTodayByAssistant(@Param("userId") UUID userId);
+
+
 }

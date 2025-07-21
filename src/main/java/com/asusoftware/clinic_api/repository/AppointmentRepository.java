@@ -21,4 +21,8 @@ public interface AppointmentRepository extends JpaRepository<Appointment, UUID> 
     @Query("SELECT COUNT(a) FROM Appointment a WHERE DATE(a.startTime) = CURRENT_DATE AND a.doctor.userId = :userId")
     int countTodayAppointmentsByDoctor(@Param("userId") UUID userId);
 
+    @Query("SELECT COUNT(a) FROM Appointment a WHERE DATE(a.startTime) = CURRENT_DATE AND a.assistant.userId = :userId")
+    int countTodayAppointmentsByAssistant(@Param("userId") UUID userId);
+
+
 }
