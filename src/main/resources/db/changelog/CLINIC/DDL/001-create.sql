@@ -41,6 +41,20 @@ CREATE TABLE doctor_assistant (
     UNIQUE(doctor_id, assistant_id)
 );
 
+-- === Table: invitations ===
+CREATE TABLE invitations (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    email VARCHAR(150) NOT NULL,
+    role VARCHAR(20) NOT NULL CHECK (role IN ('DOCTOR', 'ASSISTANT')),
+    cabinet_id UUID, -- poate fi NULL pentru ASISTENT
+    doctor_id UUID,  -- poate fi NULL pentru DOCTOR
+    invited_by UUID NOT NULL, -- user_id care a făcut invitația
+    status VARCHAR(20) NOT NULL DEFAULT 'PENDING' CHECK (status IN ('PENDING', 'ACCEPTED', 'EXPIRED')),
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    accepted_at TIMESTAMP
+);
+
+
 -- === Table: patients ===
 CREATE TABLE patients (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
