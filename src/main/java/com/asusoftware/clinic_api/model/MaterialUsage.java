@@ -1,13 +1,11 @@
 package com.asusoftware.clinic_api.model;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 @EqualsAndHashCode(callSuper = true)
@@ -28,8 +26,15 @@ public class MaterialUsage extends BaseEntity {
     @JoinColumn(name = "material_id", nullable = false)
     private Material material;
 
-    private Double quantity;
+    @Column(precision = 10, scale = 2)
+    private BigDecimal quantity;
+
     private LocalDateTime usageDate;
     private String notes;
+
+    @ManyToOne
+    @JoinColumn(name = "assistant_id")
+    private Assistant assistant;
+
 }
 

@@ -6,6 +6,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -15,14 +16,42 @@ public interface AppointmentRepository extends JpaRepository<Appointment, UUID> 
     List<Appointment> findAllByDoctor_UserIdOrAssistant_UserId(UUID doctorUserId, UUID assistantUserId);
     Optional<Appointment> findByIdAndDoctor_UserIdOrAssistant_UserId(UUID id, UUID doctorUserId, UUID assistantUserId);
 
-    @Query("SELECT COUNT(a) FROM Appointment a WHERE DATE(a.startTime) = CURRENT_DATE AND a.doctor.cabinet.owner.id = :tenantId")
-    int countTodayAppointmentsByTenant(@Param("tenantId") UUID tenantId);
+    @Query("""
+    SELECT COUNT(a) FROM Appointment a
+    WHERE a.doctor.cabinet.ownerId = :tenantId
+    AND a.startTime BETWEEN :startOfDay AND :endOfDay
+""")
+    int countTodayAppointmentsByTenant(
+            @Param("tenantId") UUID tenantId,
+            @Param("startOfDay") LocalDateTime startOfDay,
+            @Param("endOfDay") LocalDateTime endOfDay
+    );
 
-    @Query("SELECT COUNT(a) FROM Appointment a WHERE DATE(a.startTime) = CURRENT_DATE AND a.doctor.userId = :userId")
-    int countTodayAppointmentsByDoctor(@Param("userId") UUID userId);
 
-    @Query("SELECT COUNT(a) FROM Appointment a WHERE DATE(a.startTime) = CURRENT_DATE AND a.assistant.userId = :userId")
-    int countTodayAppointmentsByAssistant(@Param("userId") UUID userId);
+    @Query("""
+    SELECT COUNT(a) FROM Appointment a
+    WHERE a.doctor.id = :doctorId
+    AND a.startTime BETWEEN :startOfDay AND :endOfDay
+""")
+    int countTodayAppointmentsByDoctor(
+            @Param("doctorId") UUID doctorId,
+            @Param("startOfDay") LocalDateTime startOfDay,
+            @Param("endOfDay") LocalDateTime endOfDay
+    );
+
+
+    @Query("""
+    SELECT COUNT(a) FROM Appointment a
+    WHERE a.assistant.id = :assistantId
+    AND a.startTime BETWEEN :startOfDay AND :endOfDay
+""")
+    int countTodayAppointmentsByAssistant(
+            @Param("assistantId") UUID assistantId,
+            @Param("startOfDay") LocalDateTime startOfDay,
+            @Param("endOfDay") LocalDateTime endOfDay
+    );
+
+
 
 
 }

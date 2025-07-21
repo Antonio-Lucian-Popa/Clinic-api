@@ -5,7 +5,7 @@ server:
 
 spring:
   datasource:
-    url: jdbc:postgresql://antonio-dev.go.ro:15883/clinicDb
+    url: jdbc:postgresql://antonio-dev.go.ro:15884/clinicDb
     username: postgres
     password: password
     driver-class-name: org.postgresql.Driver

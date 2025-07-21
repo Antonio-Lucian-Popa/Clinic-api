@@ -10,6 +10,8 @@ import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
@@ -31,9 +33,12 @@ public class DashboardService {
             UUID tenantId = UUID.fromString(jwt.getClaimAsString("tenant_id"));
             int cabinets = cabinetRepo.findAllByOwnerId(tenantId).size();
             int doctors = doctorRepo.findByCabinet_OwnerId(tenantId).size();
-            int assistants = assistantRepo.findByCabinet_OwnerId(tenantId).size();
+            int assistants = assistantRepo.findAllByOwnerId(tenantId).size();
 
-            int appointments = appointmentRepo.countTodayAppointmentsByTenant(tenantId);
+            LocalDateTime startOfDay = LocalDate.now().atStartOfDay();
+            LocalDateTime endOfDay = startOfDay.plusDays(1);
+
+            int appointments = appointmentRepo.countTodayAppointmentsByTenant(tenantId, startOfDay, endOfDay);
             int usages = materialUsageRepo.countTodayByTenant(tenantId);
             int pending = timeOffRepo.countByStatus(TimeOffRequestStatus.PENDING);
 
@@ -48,7 +53,10 @@ public class DashboardService {
 
         } else if (roles.contains("DOCTOR")) {
             UUID userId = UUID.fromString(jwt.getSubject());
-            int appointments = appointmentRepo.countTodayAppointmentsByDoctor(userId);
+
+            LocalDateTime startOfDay = LocalDate.now().atStartOfDay();
+            LocalDateTime endOfDay = startOfDay.plusDays(1);
+            int appointments = appointmentRepo.countTodayAppointmentsByDoctor(userId, startOfDay, endOfDay);
             int usages = materialUsageRepo.countTodayByDoctor(userId);
             int ownTimeOffs = timeOffRepo.findByUserId(userId).size();
 
@@ -60,8 +68,11 @@ public class DashboardService {
 
         } else if (roles.contains("ASSISTANT")) {
             UUID userId = UUID.fromString(jwt.getSubject());
-            int appointments = appointmentRepo.countTodayAppointmentsByAssistant(userId);
-            int usages = materialUsageRepo.countTodayByAssistant(userId);
+
+            LocalDateTime start = LocalDate.now().atStartOfDay();
+            LocalDateTime end = start.plusDays(1);
+            int appointments = appointmentRepo.countTodayAppointmentsByAssistant(userId, start, end);
+            int usages = materialUsageRepo.countTodayByAssistant(userId, start, end);
             int ownTimeOffs = timeOffRepo.findByUserId(userId).size();
 
             return DashboardResponse.builder()

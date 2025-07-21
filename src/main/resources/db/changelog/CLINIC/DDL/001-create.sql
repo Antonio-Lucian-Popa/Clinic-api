@@ -114,6 +114,8 @@ CREATE TABLE time_off_requests (
     role VARCHAR(20) NOT NULL,
     start_date DATE NOT NULL,
     end_date DATE NOT NULL,
+    approved_by UUID, -- poate fi NULL dacă nu a fost aprobat
+    approved_at TIMESTAMP,
     reason TEXT,
     status VARCHAR(20) DEFAULT 'APPROVED',
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
@@ -130,3 +132,6 @@ CREATE TABLE medical_documents (
     notes TEXT,
     uploaded_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
+
+
+ALTER TABLE material_usages ADD COLUMN assistant_id UUID REFERENCES assistants(id) ON DELETE SET NULL;

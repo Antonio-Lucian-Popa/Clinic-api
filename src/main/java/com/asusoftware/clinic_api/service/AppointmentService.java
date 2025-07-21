@@ -1,9 +1,6 @@
 package com.asusoftware.clinic_api.service;
 
-import com.asusoftware.clinic_api.model.Appointment;
-import com.asusoftware.clinic_api.model.Assistant;
-import com.asusoftware.clinic_api.model.Doctor;
-import com.asusoftware.clinic_api.model.Patient;
+import com.asusoftware.clinic_api.model.*;
 import com.asusoftware.clinic_api.model.dto.AppointmentRequest;
 import com.asusoftware.clinic_api.repository.AppointmentRepository;
 import com.asusoftware.clinic_api.repository.AssistantRepository;
@@ -54,7 +51,7 @@ public class AppointmentService {
         a.setAssistant(assistant);
         a.setStartTime(dto.getStartTime());
         a.setEndTime(dto.getEndTime());
-        a.setStatus("SCHEDULED");
+        a.setStatus(AppointmentStatus.SCHEDULED);
         a.setNotes(dto.getNotes());
 
         return appointmentRepository.save(a);

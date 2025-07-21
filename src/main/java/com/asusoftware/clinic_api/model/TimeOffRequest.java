@@ -6,6 +6,7 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.UUID;
 
 @EqualsAndHashCode(callSuper = true)
@@ -21,6 +22,10 @@ public class TimeOffRequest extends BaseEntity {
     private LocalDate startDate;
     private LocalDate endDate;
     private String reason;
+
+    private UUID approvedBy;
+    private LocalDateTime approvedAt;
+
 
     @Enumerated(EnumType.STRING)
     private TimeOffRequestType type;

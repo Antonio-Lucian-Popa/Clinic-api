@@ -14,11 +14,22 @@ import java.util.UUID;
 public interface AssistantRepository extends JpaRepository<Assistant, UUID> {
     Optional<Assistant> findByUserId(UUID userId);
 
-    @Query("SELECT COUNT(da.assistant.id) FROM DoctorAssistant da WHERE da.doctor.cabinet.owner.id = :ownerId")
+    @Query("""
+    SELECT COUNT(da.assistant.id)
+    FROM DoctorAssistant da
+    WHERE da.doctor.cabinet.ownerId = :ownerId
+""")
     int countAssistantsByOwner(@Param("ownerId") UUID ownerId);
 
-    @Query("SELECT a FROM Assistant a WHERE a.doctor.cabinet.ownerId = :ownerId")
-    List<Assistant> findByCabinet_OwnerId(@Param("ownerId") UUID ownerId);
+
+    @Query("""
+    SELECT a FROM Assistant a
+    JOIN DoctorAssistant da ON da.assistant = a
+    JOIN Doctor d ON da.doctor = d
+    JOIN Cabinet c ON d.cabinet = c
+    WHERE c.ownerId = :ownerId
+""")
+    List<Assistant> findAllByOwnerId(UUID ownerId);
 
 
 }

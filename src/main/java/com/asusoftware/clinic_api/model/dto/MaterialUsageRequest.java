@@ -14,7 +14,7 @@ public class MaterialUsageRequest {
     private UUID materialId;
     private UUID appointmentId;
     @NotNull
-    private Double quantity;
+    private BigDecimal quantity;
     private String notes;
 }
 
