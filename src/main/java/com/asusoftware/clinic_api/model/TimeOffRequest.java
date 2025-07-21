@@ -1,8 +1,6 @@
 package com.asusoftware.clinic_api.model;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
@@ -23,5 +21,10 @@ public class TimeOffRequest extends BaseEntity {
     private LocalDate startDate;
     private LocalDate endDate;
     private String reason;
-    private String status;
+
+    @Enumerated(EnumType.STRING)
+    private TimeOffRequestType type;
+
+    @Enumerated(EnumType.STRING)
+    private TimeOffRequestStatus status;
 }
