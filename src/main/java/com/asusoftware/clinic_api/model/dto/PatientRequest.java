@@ -3,6 +3,7 @@ package com.asusoftware.clinic_api.model.dto;
 import lombok.Data;
 
 import java.time.LocalDate;
+import java.util.List;
 
 @Data
 public class PatientRequest {
@@ -13,5 +14,10 @@ public class PatientRequest {
     private LocalDate dateOfBirth;
     private String gender;
     private String cnp;
+
+    private String address;
+    private String emergencyContact;
+    private List<String> medicalHistory;
+    private List<String> allergies;
 }
 

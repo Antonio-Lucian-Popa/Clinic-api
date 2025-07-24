@@ -1,6 +1,7 @@
 package com.asusoftware.clinic_api.model;
 
 import jakarta.persistence.Column;
+import jakarta.persistence.ElementCollection;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
 import lombok.Data;
@@ -8,6 +9,7 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
+import java.util.List;
 import java.util.UUID;
 
 @EqualsAndHashCode(callSuper = true)
@@ -29,4 +31,14 @@ public class Patient extends BaseEntity {
 
     @Column(name = "created_by", nullable = false)
     private UUID createdBy;
+
+    private String address;
+    private String emergencyContact;
+
+    @ElementCollection
+    private List<String> medicalHistory;
+
+    @ElementCollection
+    private List<String> allergies;
+
 }

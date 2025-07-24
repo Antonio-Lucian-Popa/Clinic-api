@@ -41,6 +41,12 @@ public class PatientService {
         p.setTenantId(tenantId);
         p.setCreatedBy(createdBy);
 
+        // ✅ Noile câmpuri
+        p.setAddress(dto.getAddress());
+        p.setEmergencyContact(dto.getEmergencyContact());
+        p.setMedicalHistory(dto.getMedicalHistory());
+        p.setAllergies(dto.getAllergies());
+
         return patientRepository.save(p);
     }
 
@@ -62,6 +68,13 @@ public class PatientService {
         p.setGender(dto.getGender());
         p.setCnp(dto.getCnp());
         p.setDateOfBirth(dto.getDateOfBirth());
+
+        // ✅ Noile câmpuri
+        p.setAddress(dto.getAddress());
+        p.setEmergencyContact(dto.getEmergencyContact());
+        p.setMedicalHistory(dto.getMedicalHistory());
+        p.setAllergies(dto.getAllergies());
+
         return patientRepository.save(p);
     }
 
@@ -72,3 +85,4 @@ public class PatientService {
         patientRepository.delete(p);
     }
 }
+

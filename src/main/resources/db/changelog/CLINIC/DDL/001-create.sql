@@ -133,5 +133,19 @@ CREATE TABLE medical_documents (
     uploaded_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
+CREATE TABLE patient_medical_history (
+    patient_id UUID NOT NULL REFERENCES patients(id) ON DELETE CASCADE,
+    medical_history TEXT
+);
+
+CREATE TABLE patient_allergies (
+    patient_id UUID NOT NULL REFERENCES patients(id) ON DELETE CASCADE,
+    allergies TEXT
+);
+
+
 
 ALTER TABLE material_usages ADD COLUMN assistant_id UUID REFERENCES assistants(id) ON DELETE SET NULL;
+-- Adăugăm coloanele noi în tabela patients
+ALTER TABLE patients ADD COLUMN address TEXT;
+ALTER TABLE patients ADD COLUMN emergency_contact TEXT;
