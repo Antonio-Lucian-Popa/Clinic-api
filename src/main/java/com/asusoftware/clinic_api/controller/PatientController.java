@@ -2,6 +2,7 @@ package com.asusoftware.clinic_api.controller;
 
 import com.asusoftware.clinic_api.model.Patient;
 import com.asusoftware.clinic_api.model.dto.PatientRequest;
+import com.asusoftware.clinic_api.model.dto.PatientResponse;
 import com.asusoftware.clinic_api.service.PatientService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -29,21 +30,21 @@ public class PatientController {
 
     @PreAuthorize("hasAnyRole('DOCTOR', 'ASSISTANT')")
     @PostMapping
-    public ResponseEntity<Patient> create(@RequestBody PatientRequest request,
-                                          @AuthenticationPrincipal Jwt jwt) {
+    public ResponseEntity<PatientResponse> create(@RequestBody PatientRequest request,
+                                                  @AuthenticationPrincipal Jwt jwt) {
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(patientService.createPatient(request, jwt));
     }
 
     @PreAuthorize("hasAnyRole('DOCTOR', 'ASSISTANT', 'OWNER')")
     @GetMapping("/{id}")
-    public Patient get(@PathVariable UUID id, @AuthenticationPrincipal Jwt jwt) {
+    public PatientResponse get(@PathVariable UUID id, @AuthenticationPrincipal Jwt jwt) {
         return patientService.getPatient(id, jwt);
     }
 
     @PreAuthorize("hasAnyRole('DOCTOR', 'ASSISTANT')")
     @PutMapping("/{id}")
-    public Patient update(@PathVariable UUID id,
+    public PatientResponse update(@PathVariable UUID id,
                           @RequestBody PatientRequest request,
                           @AuthenticationPrincipal Jwt jwt) {
         return patientService.updatePatient(id, request, jwt);

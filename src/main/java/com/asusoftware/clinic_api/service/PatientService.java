@@ -2,6 +2,7 @@ package com.asusoftware.clinic_api.service;
 
 import com.asusoftware.clinic_api.model.Patient;
 import com.asusoftware.clinic_api.model.dto.PatientRequest;
+import com.asusoftware.clinic_api.model.dto.PatientResponse;
 import com.asusoftware.clinic_api.repository.PatientRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -26,7 +27,7 @@ public class PatientService {
         return patientRepository.findAllByTenantId(tenantId);
     }
 
-    public Patient createPatient(PatientRequest dto, Jwt jwt) {
+    public PatientResponse createPatient(PatientRequest dto, Jwt jwt) {
         UUID tenantId = UUID.fromString(jwt.getClaimAsString("tenant_id"));
         UUID createdBy = UUID.fromString(jwt.getSubject());
 
@@ -47,16 +48,16 @@ public class PatientService {
         p.setMedicalHistory(dto.getMedicalHistory());
         p.setAllergies(dto.getAllergies());
 
-        return patientRepository.save(p);
+        return toDto(patientRepository.save(p));
     }
 
-    public Patient getPatient(UUID id, Jwt jwt) {
+    public PatientResponse getPatient(UUID id, Jwt jwt) {
         UUID tenantId = UUID.fromString(jwt.getClaimAsString("tenant_id"));
-        return patientRepository.findByIdAndTenantId(id, tenantId)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+        return toDto(patientRepository.findByIdAndTenantId(id, tenantId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND)));
     }
 
-    public Patient updatePatient(UUID id, PatientRequest dto, Jwt jwt) {
+    public PatientResponse updatePatient(UUID id, PatientRequest dto, Jwt jwt) {
         UUID tenantId = UUID.fromString(jwt.getClaimAsString("tenant_id"));
         Patient p = patientRepository.findByIdAndTenantId(id, tenantId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
@@ -75,7 +76,7 @@ public class PatientService {
         p.setMedicalHistory(dto.getMedicalHistory());
         p.setAllergies(dto.getAllergies());
 
-        return patientRepository.save(p);
+        return toDto(patientRepository.save(p));
     }
 
     public void deletePatient(UUID id, Jwt jwt) {
@@ -84,5 +85,24 @@ public class PatientService {
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
         patientRepository.delete(p);
     }
+
+    public PatientResponse toDto(Patient p) {
+        return new PatientResponse(
+                p.getId(),
+                p.getFirstName(),
+                p.getLastName(),
+                p.getEmail(),
+                p.getPhone(),
+                p.getDateOfBirth(),
+                p.getGender(),
+                p.getAddress(),
+                p.getEmergencyContact(),
+                p.getMedicalHistory(),
+                p.getAllergies(),
+                p.getCreatedAt(),
+                p.getUpdatedAt()
+        );
+    }
+
 }
 
