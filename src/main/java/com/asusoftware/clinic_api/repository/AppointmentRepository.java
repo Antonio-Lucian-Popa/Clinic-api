@@ -52,7 +52,13 @@ public interface AppointmentRepository extends JpaRepository<Appointment, UUID> 
     );
 
 
-    List<Appointment> findTop5ByTenantIdOrderByStartTimeDesc(UUID tenantId);
+    @Query("""
+    SELECT a
+    FROM Appointment a
+    WHERE a.doctor.cabinet.owner.id = :tenantId
+    ORDER BY a.startTime DESC
+""")
+    List<Appointment> findRecentAppointmentsByTenant(@Param("tenantId") UUID tenantId, Pageable pageable);
 
 
 }

@@ -6,6 +6,7 @@ import com.asusoftware.clinic_api.model.dto.AssistantDashboardResponse;
 import com.asusoftware.clinic_api.model.dto.DashboardResponse;
 import com.asusoftware.clinic_api.repository.*;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.stereotype.Service;
@@ -89,17 +90,19 @@ public class DashboardService {
     public List<AppointmentDto> getRecentAppointments(Jwt jwt) {
         UUID tenantId = UUID.fromString(jwt.getClaimAsString("tenant_id"));
 
-        // ultimele 5 programări, sortează descrescător după createdAt sau startTime
-        return appointmentRepo.findTop5ByTenantIdOrderByStartTimeDesc(tenantId).stream()
+        return appointmentRepo
+                .findRecentAppointmentsByTenant(tenantId, PageRequest.of(0, 5))
+                .stream()
                 .map(a -> AppointmentDto.builder()
                         .id(a.getId().toString())
                         .patientName(a.getPatient().getFirstName() + " " + a.getPatient().getLastName())
-                        .type(a.getNotes())
+                        .type(a.getNotes()) // sau poți adăuga un câmp nou 'type' dacă vrei mai multă claritate
                         .date(a.getStartTime().toLocalDate().toString())
                         .time(a.getStartTime().toLocalTime().toString())
                         .build()
                 )
                 .toList();
     }
+
 
 }
