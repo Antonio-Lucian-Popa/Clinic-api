@@ -1,8 +1,12 @@
 package com.asusoftware.clinic_api.service;
 
+import com.asusoftware.clinic_api.model.DoctorAssistant;
 import com.asusoftware.clinic_api.model.Patient;
 import com.asusoftware.clinic_api.model.dto.PatientRequest;
 import com.asusoftware.clinic_api.model.dto.PatientResponse;
+import com.asusoftware.clinic_api.repository.AssistantRepository;
+import com.asusoftware.clinic_api.repository.DoctorAssistantRepository;
+import com.asusoftware.clinic_api.repository.DoctorRepository;
 import com.asusoftware.clinic_api.repository.PatientRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -11,6 +15,7 @@ import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.UUID;
 
@@ -21,14 +26,42 @@ import java.time.LocalDateTime;
 public class PatientService {
 
     private final PatientRepository patientRepository;
+    private final DoctorRepository doctorRepository;
+    private final DoctorAssistantRepository doctorAssistantRepository;
 
     public List<Patient> getPatientsByTenant(Jwt jwt) {
-        UUID tenantId = UUID.fromString(jwt.getClaimAsString("tenant_id"));
+        UUID tenantId = resolveTenantId(jwt);
         return patientRepository.findAllByTenantId(tenantId);
     }
 
+    public int getNewPatientsThisMonth(Jwt jwt) {
+        UUID tenantId = resolveTenantId(jwt);
+        LocalDateTime startOfMonth = LocalDate.now().withDayOfMonth(1).atStartOfDay();
+        return patientRepository.countPatientsCreatedThisMonth(tenantId, startOfMonth);
+    }
+
+
     public PatientResponse createPatient(PatientRequest dto, Jwt jwt) {
-        UUID tenantId = UUID.fromString(jwt.getClaimAsString("tenant_id"));
+        UUID userId = UUID.fromString(jwt.getSubject());
+        List<String> roles = jwt.getClaimAsStringList("roles");
+
+        UUID tenantId;
+
+        if (roles.contains("OWNER")) {
+            tenantId = userId; // OWNER = TENANT
+        } else if (roles.contains("DOCTOR")) {
+            tenantId = doctorRepository.findById(userId)
+                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Doctor not found"))
+                    .getCabinet().getOwnerId();;
+        } else if (roles.contains("ASSISTANT")) {
+            DoctorAssistant da = doctorAssistantRepository.findByAssistant_UserId(userId)
+                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "DoctorAssistant not found"));
+
+            tenantId = da.getDoctor().getCabinet().getOwnerId();
+        } else {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Invalid role");
+        }
+
         UUID createdBy = UUID.fromString(jwt.getSubject());
 
         Patient p = new Patient();
@@ -104,5 +137,23 @@ public class PatientService {
         );
     }
 
+    public UUID resolveTenantId(Jwt jwt) {
+        UUID userId = UUID.fromString(jwt.getSubject());
+        List<String> roles = jwt.getClaimAsStringList("roles");
+
+        if (roles.contains("OWNER")) {
+            return userId;
+        } else if (roles.contains("DOCTOR")) {
+            return doctorRepository.findById(userId)
+                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Doctor not found"))
+                    .getCabinet().getOwnerId();
+        } else if (roles.contains("ASSISTANT")) {
+            return doctorAssistantRepository.findByAssistant_UserId(userId)
+                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "DoctorAssistant not found"))
+                    .getDoctor().getCabinet().getOwnerId();
+        }
+
+        throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Invalid role for tenant resolution");
+    }
 }
 

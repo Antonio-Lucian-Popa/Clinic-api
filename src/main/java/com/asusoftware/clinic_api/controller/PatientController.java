@@ -56,5 +56,12 @@ public class PatientController {
         patientService.deletePatient(id, jwt);
         return ResponseEntity.noContent().build();
     }
+
+    @PreAuthorize("hasAnyRole('DOCTOR', 'ASSISTANT', 'OWNER')")
+    @GetMapping("/stats/new-this-month")
+    public int getNewPatientsThisMonth(@AuthenticationPrincipal Jwt jwt) {
+        return patientService.getNewPatientsThisMonth(jwt);
+    }
+
 }
 
