@@ -29,3 +29,6 @@ jwt:
 clinic:
   documents:
     upload-dir: uploads/documents
+
+cors:
+  allowed-origins: ${FRONTEND_URL:http://localhost:5173}
