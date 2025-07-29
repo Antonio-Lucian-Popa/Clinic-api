@@ -1,6 +1,7 @@
 package com.asusoftware.clinic_api.service;
 
 import com.asusoftware.clinic_api.model.TimeOffRequestStatus;
+import com.asusoftware.clinic_api.model.dto.AppointmentDto;
 import com.asusoftware.clinic_api.model.dto.AssistantDashboardResponse;
 import com.asusoftware.clinic_api.model.dto.DashboardResponse;
 import com.asusoftware.clinic_api.repository.*;
@@ -83,6 +84,22 @@ public class DashboardService {
         }
 
         throw new ResponseStatusException(HttpStatus.FORBIDDEN);
+    }
+
+    public List<AppointmentDto> getRecentAppointments(Jwt jwt) {
+        UUID tenantId = UUID.fromString(jwt.getClaimAsString("tenant_id"));
+
+        // ultimele 5 programări, sortează descrescător după createdAt sau startTime
+        return appointmentRepo.findTop5ByTenantIdOrderByStartTimeDesc(tenantId).stream()
+                .map(a -> AppointmentDto.builder()
+                        .id(a.getId().toString())
+                        .patientName(a.getPatient().getFirstName() + " " + a.getPatient().getLastName())
+                        .type(a.getNotes())
+                        .date(a.getStartTime().toLocalDate().toString())
+                        .time(a.getStartTime().toLocalTime().toString())
+                        .build()
+                )
+                .toList();
     }
 
 }
