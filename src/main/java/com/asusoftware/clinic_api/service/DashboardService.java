@@ -27,15 +27,18 @@ public class DashboardService {
     private final AppointmentRepository appointmentRepo;
     private final MaterialUsageRepository materialUsageRepo;
     private final TimeOffRequestRepository timeOffRepo;
+    private final PatientRepository patientRepo;
 
     public DashboardResponse getDashboard(Jwt jwt) {
         List<String> roles = jwt.getClaimAsStringList("roles");
 
         if (roles.contains("OWNER")) {
-            UUID tenantId = UUID.fromString(jwt.getClaimAsString("tenant_id"));
+            UUID tenantId = UUID.fromString(jwt.getSubject());
+
             int cabinets = cabinetRepo.findAllByOwnerId(tenantId).size();
             int doctors = doctorRepo.findByCabinet_OwnerId(tenantId).size();
             int assistants = assistantRepo.findAllByOwnerId(tenantId).size();
+            int patients = patientRepo.countByTenantId(tenantId);
 
             LocalDateTime startOfDay = LocalDate.now().atStartOfDay();
             LocalDateTime endOfDay = startOfDay.plusDays(1);
@@ -43,12 +46,15 @@ public class DashboardService {
             int appointments = appointmentRepo.countTodayAppointmentsByTenant(tenantId, startOfDay, endOfDay);
             int usages = materialUsageRepo.countTodayByTenant(tenantId);
             int pending = timeOffRepo.countByStatus(TimeOffRequestStatus.PENDING);
+            int pendingAppointments = appointmentRepo.countPendingAppointmentsByTenant(tenantId); // 👈 nou
 
             return DashboardResponse.builder()
                     .totalCabinets(cabinets)
                     .totalDoctors(doctors)
                     .totalAssistants(assistants)
+                    .totalPatients(patients)
                     .todayAppointments(appointments)
+                    .pendingAppointments(pendingAppointments) // 👈 adaugă
                     .todayMaterialUsages(usages)
                     .timeOffRequests(pending)
                     .build();
@@ -88,7 +94,7 @@ public class DashboardService {
     }
 
     public List<AppointmentDto> getRecentAppointments(Jwt jwt) {
-        UUID tenantId = UUID.fromString(jwt.getClaimAsString("tenant_id"));
+        UUID tenantId = UUID.fromString(jwt.getSubject());
 
         return appointmentRepo
                 .findRecentAppointmentsByTenant(tenantId, PageRequest.of(0, 5))

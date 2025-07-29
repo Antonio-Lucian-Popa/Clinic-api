@@ -1,6 +1,7 @@
 package com.asusoftware.clinic_api.repository;
 
 import com.asusoftware.clinic_api.model.Appointment;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -53,12 +54,18 @@ public interface AppointmentRepository extends JpaRepository<Appointment, UUID> 
 
 
     @Query("""
-    SELECT a
-    FROM Appointment a
-    WHERE a.doctor.cabinet.owner.id = :tenantId
+    SELECT a FROM Appointment a
+    WHERE a.doctor.cabinet.ownerId = :tenantId
     ORDER BY a.startTime DESC
 """)
     List<Appointment> findRecentAppointmentsByTenant(@Param("tenantId") UUID tenantId, Pageable pageable);
+
+    @Query("""
+    SELECT COUNT(a) FROM Appointment a
+    WHERE a.doctor.cabinet.ownerId = :tenantId
+    AND a.status = 'PENDING'
+""")
+    int countPendingAppointmentsByTenant(@Param("tenantId") UUID tenantId);
 
 
 }

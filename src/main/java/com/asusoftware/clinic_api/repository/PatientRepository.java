@@ -12,5 +12,7 @@ import java.util.UUID;
 public interface PatientRepository extends JpaRepository<Patient, UUID> {
     List<Patient> findAllByTenantId(UUID tenantId);
     Optional<Patient> findByIdAndTenantId(UUID id, UUID tenantId);
+
+    int countByTenantId(UUID tenantId);
 }
 
