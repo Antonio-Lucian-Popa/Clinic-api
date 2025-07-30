@@ -28,7 +28,7 @@ public class PatientController {
         return patientService.getPatientsByTenant(jwt);
     }
 
-    @PreAuthorize("hasAnyRole('OWNER', DOCTOR', 'ASSISTANT')")
+    @PreAuthorize("hasAnyRole('OWNER', 'DOCTOR', 'ASSISTANT')")
     @PostMapping
     public ResponseEntity<PatientResponse> create(@RequestBody PatientRequest request,
                                                   @AuthenticationPrincipal Jwt jwt) {
