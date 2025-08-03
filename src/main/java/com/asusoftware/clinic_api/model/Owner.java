@@ -2,27 +2,30 @@ package com.asusoftware.clinic_api.model;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import lombok.Data;
-import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
+import java.time.Instant;
 import java.util.UUID;
 
-@EqualsAndHashCode(callSuper = true)
 @Entity
-@Table(name = "assistants")
+@Table(name = "owners")
 @Data
 @NoArgsConstructor
-public class Assistant extends BaseEntity {
-    @Column(name = "user_id", nullable = false)
+public class Owner {
+
+    @Column(nullable = false, unique = true)
     private UUID userId;
 
-    @Column(name = "first_name", nullable = false)
+    @Column(nullable = false)
     private String firstName;
 
-    @Column(name = "last_name", nullable = false)
+    @Column(nullable = false)
     private String lastName;
 
-    private Boolean active = true;
+    private String phone;
+
+    private Instant createdAt = Instant.now();
 }

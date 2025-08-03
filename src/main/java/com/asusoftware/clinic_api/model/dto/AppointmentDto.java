@@ -3,12 +3,21 @@ package com.asusoftware.clinic_api.model.dto;
 import lombok.Builder;
 import lombok.Data;
 
-@Data
+import java.util.UUID;
+
 @Builder
-public class AppointmentDto {
-    private String id;
-    private String patientName;
-    private String type;
-    private String date;
-    private String time;
-}
+public record AppointmentDto(
+        UUID id,
+        UUID patientId,
+        String patientName,
+        UUID doctorId,
+        String doctorName,
+        String date,
+        String time,
+        long duration,
+        String type,
+        String status,
+        String notes,
+        String createdAt
+) {}
+

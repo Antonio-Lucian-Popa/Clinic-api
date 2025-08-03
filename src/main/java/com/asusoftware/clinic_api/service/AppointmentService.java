@@ -1,6 +1,7 @@
 package com.asusoftware.clinic_api.service;
 
 import com.asusoftware.clinic_api.model.*;
+import com.asusoftware.clinic_api.model.dto.AppointmentDto;
 import com.asusoftware.clinic_api.model.dto.AppointmentRequest;
 import com.asusoftware.clinic_api.repository.AppointmentRepository;
 import com.asusoftware.clinic_api.repository.AssistantRepository;
@@ -13,6 +14,7 @@ import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.time.Duration;
 import java.util.List;
 import java.util.UUID;
 
@@ -92,4 +94,22 @@ public class AppointmentService {
         Appointment a = getById(id, jwt);
         appointmentRepository.delete(a);
     }
+
+    public AppointmentDto toDto(Appointment a) {
+        return AppointmentDto.builder()
+                .id(a.getId())
+                .patientId(a.getPatient().getId())
+                .patientName(a.getPatient().getFirstName() + " " + a.getPatient().getLastName())
+                .doctorId(a.getDoctor().getId())
+                .doctorName(a.getDoctor().getFirstName() + " " + a.getDoctor().getLastName())
+                .date(a.getStartTime().toLocalDate().toString())
+                .time(a.getStartTime().toLocalTime().toString())
+                .duration(Duration.between(a.getStartTime(), a.getEndTime()).toMinutes())
+                .type("Consultation") // sau adaugă `type` în entitate
+                .status(a.getStatus().name())
+                .notes(a.getNotes())
+                .createdAt(a.getCreatedAt().toString())
+                .build();
+    }
+
 }

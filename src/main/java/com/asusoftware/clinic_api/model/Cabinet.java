@@ -1,9 +1,7 @@
 package com.asusoftware.clinic_api.model;
 
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -22,6 +20,8 @@ public class Cabinet extends BaseEntity {
     private String address;
     private String phone;
 
-    @Column(name = "owner_id", nullable = false)
-    private UUID ownerId;
+    @ManyToOne
+    @JoinColumn(name = "owner_id", nullable = false)
+    private Owner owner;
+
 }

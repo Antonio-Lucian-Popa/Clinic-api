@@ -13,10 +13,22 @@ CREATE TABLE cabinets (
     UNIQUE(owner_id, name)
 );
 
+CREATE TABLE owners (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    user_id UUID NOT NULL UNIQUE,
+    first_name VARCHAR(100) NOT NULL,
+    last_name VARCHAR(100) NOT NULL,
+    phone VARCHAR(20),
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+
 -- === Table: doctors ===
 CREATE TABLE doctors (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     user_id UUID NOT NULL,
+    first_name VARCHAR(100) NOT NULL,
+    last_name VARCHAR(100) NOT NULL,
     cabinet_id UUID NOT NULL REFERENCES cabinets(id) ON DELETE CASCADE,
     specialization VARCHAR(100),
     room_label VARCHAR(50),
@@ -29,6 +41,8 @@ CREATE TABLE doctors (
 CREATE TABLE assistants (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     user_id UUID NOT NULL,
+    first_name VARCHAR(100) NOT NULL,
+    last_name VARCHAR(100) NOT NULL,
     active BOOLEAN DEFAULT TRUE,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
@@ -149,3 +163,7 @@ ALTER TABLE material_usages ADD COLUMN assistant_id UUID REFERENCES assistants(i
 -- Adăugăm coloanele noi în tabela patients
 ALTER TABLE patients ADD COLUMN address TEXT;
 ALTER TABLE patients ADD COLUMN emergency_contact TEXT;
+
+ALTER TABLE cabinets
+    DROP CONSTRAINT IF EXISTS cabinets_owner_id_fkey,
+    ADD CONSTRAINT cabinets_owner_id_fkey FOREIGN KEY (owner_id) REFERENCES owners(id) ON DELETE CASCADE;

@@ -100,7 +100,7 @@ public class DashboardService {
                 .findRecentAppointmentsByTenant(tenantId, PageRequest.of(0, 5))
                 .stream()
                 .map(a -> AppointmentDto.builder()
-                        .id(a.getId().toString())
+                        .id(a.getId())
                         .patientName(a.getPatient().getFirstName() + " " + a.getPatient().getLastName())
                         .type(a.getNotes()) // sau poți adăuga un câmp nou 'type' dacă vrei mai multă claritate
                         .date(a.getStartTime().toLocalDate().toString())
